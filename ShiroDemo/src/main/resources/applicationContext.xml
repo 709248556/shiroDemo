@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+      http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+      http://www.springframework.org/schema/context
+      http://www.springframework.org/schema/context/spring-context.xsd">
+	<!-- 扫描文件(自动将service层注入) -->
+	<context:component-scan
+		base-package="com.yan.shiro.service" /> <!-- 1 -->
+	<!--引入jdbc配置 -->
+	<context:property-placeholder
+		location="classpath:jdbc.properties" /> <!-- 2 -->
+
+	<!--配置数据源 -->
+	<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource"> <!-- 3 -->
+		<property name="driverClassName" value="${driver}" />
+		<property name="url" value="${url}" />
+		<property name="username" value="${name}" />
+		<property name="password" value="${password}" />
+		<!-- 初始化连接大小 -->
+		<property name="initialSize" value="${initialSize}"></property>
+		<!-- 连接池最大数量 -->
+		<property name="maxActive" value="${maxActive}"></property>
+		<!-- 连接池最大空闲 -->
+		<property name="maxIdle" value="${maxIdle}"></property>
+		<!-- 连接池最小空闲 -->
+		<property name="minIdle" value="${minIdle}"></property>
+		<!-- 获取连接最大等待时间 -->
+		<property name="maxWait" value="${maxWait}"></property>
+	</bean>
+
+	<!--配置sqlSessionFactory 并将数据源注入 -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<!--注入数据源 -->
+		<property name="dataSource" ref="dataSource" />
+		<!-- 配置configLocation属性,使mybatis-config.xml文件生效 -->
+		<property name="configLocation" value="classpath:mybatis-config.xml"></property> <!-- 4 -->
+		<!--用于配置mapper映射xml -->
+		<property name="mapperLocations" value="classpath:com/yan/shiro/mapper/*.xml" /> <!-- 5 -->
+	</bean>
+	<!-- 创建数据映射器 -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<!-- 注入sqlSessionFactory -->
+		<property name="sqlSessionFactoryBeanName" value="sqlSessionFactory" />
+		<property name="basePackage" value="com.yan.shiro.dao" />  <!-- 6 -->
+	</bean>
+	<!-- 对数据源进行事务管理 -->
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	
+	<!-- 引入shiro的配置文件 -->
+	<import resource="classpath:applicationContext-shiro.xml" /> <!-- 7 -->
+	
+</beans>
