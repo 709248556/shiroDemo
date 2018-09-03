@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- 配置緩存管理器 -->
+    <bean id="cacheManager" class="org.apache.shiro.cache.ehcache.EhCacheManager">
+        <!-- 指定 ehcache 的配置文件，下面会给到 -->
+        <property name="cacheManagerConfigFile" value="classpath:ehcache-shiro.xml"/>
+    </bean>
+
+    <!-- 注册自定义的Realm，并把密码匹配器注入，使用注解的方式自动注解会无法正确匹配密码 -->
+    <bean id="myRealm"
+        class="shiro.MyRealm"
+        init-method="setCredentialMatcher">
+    </bean>
+
+    <!-- 配置 Shiro 的 SecurityManager Bean. -->
+    <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+        <property name="cacheManager" ref="cacheManager"/>
+        <property name="realm" ref="myRealm"/>
+    </bean>
+    
+    <!-- 配置 Bean 后置处理器: 会自动的调用和 Spring 整合后各个组件的生命周期方法. -->
+    <bean id="lifecycleBeanPostProcessor" 
+        class="org.apache.shiro.spring.LifecycleBeanPostProcessor"/>
+
+    <!-- 配置 ShiroFilter bean: 该 bean 的 id 必须和 web.xml 文件中配置的 shiro filter 的 name 一致  -->
+    <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+        <!-- 装配 securityManager -->
+        <property name="securityManager" ref="securityManager"/>
+        <!-- 配置登陆页面 -->
+        <property name="loginUrl" value="/user/login.do"/>
+        <!-- 登陆成功后的页面 -->
+        <property name="successUrl" value="/success.jsp"/>
+        <!-- 没有相应权限是跳转的页面 -->
+        <property name="unauthorizedUrl" value="/error.jsp"/>
+        <!-- 具体配置需要拦截哪些 URL, 以及访问对应的 URL 时使用 Shiro 的什么 Filter 进行拦截.  -->
+        <property name="filterChainDefinitions">
+            <value>
+                <!-- 配置登出: 使用 logout 过滤器 -->
+                <!-- /后是访问页面的路径，=后面是要求具有的的角色或者角色具备的权限 -->
+                /static/** = anon  
+                /shiro-logout = logout
+                /shiro-* = anon
+                /login.jsp=anon
+                /success.jsp = roles[user]
+                /user.jsp = anon
+                /admin.jsp = anon
+                /** = authc
+            </value>
+        </property>
+    </bean>
+     <!-- AOP式方法级权限检查 -->
+    <bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator"
+        depends-on="lifecycleBeanPostProcessor">
+        <property name="proxyTargetClass" value="true" />
+    </bean>
+
+    <bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
+        <property name="securityManager" ref="securityManager" />
+    </bean>
+
+</beans>

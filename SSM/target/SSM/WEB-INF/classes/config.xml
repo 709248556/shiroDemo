@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!--为com.mjl.model.User设置别名 User 方便调用-->
+    <typeAliases>
+        <typeAlias alias="User" type="model.User"/>
+    </typeAliases>
+</configuration>
+
+
+
