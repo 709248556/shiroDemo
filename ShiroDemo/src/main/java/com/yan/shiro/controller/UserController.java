@@ -101,16 +101,24 @@ public class UserController {
         }
     }
     
-	@RequestMapping(value = "/login", method = RequestMethod.POST)
+	@RequestMapping(value = "/login.do", method = RequestMethod.POST)
 	public String login(HttpServletRequest request) {
+		System.out.println("UserController的login方法开始执行");
+		System.out.println("UserController的login方法开始执行");
+		System.out.println("UserController的login方法开始执行");
+		System.out.println("UserController的login方法开始执行");
+		System.out.println("UserController的login方法开始执行");
+		System.out.println("UserController的login方法开始执行");
+		System.out.println("UserController的login方法开始执行");
 		System.out.println("UserController的login方法开始执行");
 		String username = request.getParameter("username");
 		String password = request.getParameter("password");
+		int rememeberMe = Integer.valueOf(request.getParameter("abcd"));
 		Subject subject = SecurityUtils.getSubject();
 		UsernamePasswordToken token = new UsernamePasswordToken(username,password);
-		System.out.println("token已经完成");
-//		token.setRememberMe(true);
+		if(rememeberMe == 1) token.setRememberMe(true);
 		try {
+			//执行认证操作.
 			subject.login(token);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -118,5 +126,4 @@ public class UserController {
 		}
 		return "success";
 	}
-
 }

@@ -4,16 +4,34 @@
 <body>
 <h2>Hello World!</h2>
 <shiro:guest>
-欢迎游客访问，<a href="${pageContext.request.contextPath}/login.jsp">登录</a>
+欢迎游客访问，<a href="${pageContext.request.contextPath}/login.jsp">登录</a><br/>
 </shiro:guest>&nbsp;
 <shiro:user>
-欢迎 用户访问，<a href="${pageContext.request.contextPath}/login.jsp">登录</a>
+欢迎 用户访问，<a href="${pageContext.request.contextPath}/login.jsp">登录</a><br/>
 </shiro:user>&nbsp;
-<shiro:authenticated>
-    用户[<shiro:principal/>]已身份验证通过
-</shiro:authenticated>&nbsp;
-<shiro:notAuthenticated>
-    未身份验证（包括记住我）
-</shiro:notAuthenticated> 
+
+
+<!-- 显示用户身份信息，默认调用 Subject.getPrincipal() 获取-->
+<shiro:principal type="java.lang.String"/><br/><!-- 相当于 Subject.getPrincipals().oneByType(String.class)  -->
+
+<shiro:principal type="java.lang.String"/><br/><!-- 相当于 Subject.getPrincipals().oneByType(String.class) -->
+
+
+<shiro:hasAnyRoles name="admin,user">
+    用户[<shiro:principal/>]拥有角色admin或user<br/>
+</shiro:hasAnyRoles>
+
+<shiro:lacksRole name="abc">
+    用户[<shiro:principal/>]没有角色abc<br/> <!-- 如果当前 Subject abc角色将显示 body 体内容。 -->
+</shiro:lacksRole>
+
+<shiro:hasPermission name="user:create">
+    用户[<shiro:principal/>]拥有权限user:create<br/> <!-- 如果当前 Subject 有create权限将显示 body 体内容。 -->
+</shiro:hasPermission>
+
+<shiro:lacksPermission name="org:create">
+    用户[<shiro:principal/>]没有权限org:create<br/> <!-- 如果当前 Subject 没有create权限将显示 body 体内容。  -->
+</shiro:lacksPermission>
+
 </body>
 </html>

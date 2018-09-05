@@ -43,7 +43,7 @@ function refreshCaptcha(){
 	%>
  
 	<form action="login.jsp" method="post">
-		<input type="hidden" name="rememberMe" value="true" /> <br />
+		<input type="hidden" name="rememberMe" value="0" /> <br />
 		<table>
  
 			<tr>

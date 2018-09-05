@@ -1,6 +1,5 @@
 package com.yan.shiro.common;
 
-import java.util.List;
 import java.util.Set;
 
 import org.apache.shiro.SecurityUtils;
@@ -25,11 +24,16 @@ public class UserRealm extends AuthorizingRealm {
 	@Autowired
 	private UserService userService;
 
+	/**
+	 * 授权
+	 */
 	@Override
 	protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
 		System.out.println("UserRealm的doGetAuthorizationInfo方法开始执行");
 		SimpleAuthorizationInfo authorizationInfo = new SimpleAuthorizationInfo();
+		//获取当前登陆的用户名
 		String username = (String) SecurityUtils.getSubject().getPrincipal();
+		//从数据库中查找该用户名拥有的角色
 		Set<String> roleList = userService.selectRoleByUserName(username);
 		// 添加角色
 		authorizationInfo.addRoles(roleList);
@@ -37,45 +41,26 @@ public class UserRealm extends AuthorizingRealm {
 		// authorizationInfo.setStringPermissions(userService.findPermissions(username));
 		return authorizationInfo;
 	}
-
+	
+	/**
+	 * 登陆验证
+	 */
 	@Override
 	protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
 		System.out.println("UserRealm的doGetAuthenticationInfo方法开始执行");
+		//获取当前登陆的用户名
 		String userName = (String) token.getPrincipal();
-		System.out.println("userName:" + userName);
+		//从数据库中获取user
 		User user = userService.selectByUserName(userName);
-		System.out.println("user:" + user);
-		// 用用户名作为盐
+		// 为密码加盐
 		ByteSource credentialsSalt = ByteSource.Util.bytes(user.getSalt());// 这里的参数要给个唯一的;
-		SimpleAuthenticationInfo authenticationInfo = new SimpleAuthenticationInfo(user.getName(), user.getPassword(),
-				credentialsSalt, getName());
+		// 校验
+		SimpleAuthenticationInfo authenticationInfo = new SimpleAuthenticationInfo(user.getName(), user.getPassword(),credentialsSalt, getName());
 		return authenticationInfo;
 	}
-
+	
 	public static void main(String[] args) {
-		SimpleHash MD5 = new SimpleHash("MD5", "123456", ByteSource.Util.bytes("abcd"), 1024);
+		SimpleHash MD5 = new SimpleHash("MD5", "13245678901", ByteSource.Util.bytes("13245678901"), 1024);
 		System.out.println(MD5);
-	}
-
-	/**
-	 * 自定义验证码为空异常 AuthenticationException为Shiro认证错误的异常,不同错误类型继承该异常即可
-	 */
-	public class CaptchaEmptyException extends AuthenticationException {
-
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 1L;
-	}
-
-	/**
-	 * 自定义验证码错误异常 AuthenticationException为Shiro认证错误的异常,不同错误类型继承该异常即可
-	 */
-	public class CaptchaErrorException extends AuthenticationException {
-
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 1L;
 	}
 }
