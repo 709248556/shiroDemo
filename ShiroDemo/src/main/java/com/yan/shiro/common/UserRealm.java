@@ -60,7 +60,7 @@ public class UserRealm extends AuthorizingRealm {
 	}
 	
 	public static void main(String[] args) {
-		SimpleHash MD5 = new SimpleHash("MD5", "13245678901", ByteSource.Util.bytes("13245678901"), 1024);
+		SimpleHash MD5 = new SimpleHash("MD5", "123456", ByteSource.Util.bytes("ะกร๗"), 1024);
 		System.out.println(MD5);
 	}
 }

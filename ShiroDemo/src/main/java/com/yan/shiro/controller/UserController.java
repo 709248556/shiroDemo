@@ -3,6 +3,7 @@ package com.yan.shiro.controller;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import javax.imageio.ImageIO;
 import javax.servlet.ServletOutputStream;
@@ -23,9 +24,15 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.google.code.kaptcha.Constants;
 import com.google.code.kaptcha.Producer;
 import com.yan.shiro.model.User;
+import com.yan.shiro.service.UserService;
 
 @Controller
 public class UserController {
+	
+	@Autowired
+	private UserService userService;
+	
+	
 	/**
 	 * 登陆
 	 * @param user
@@ -104,13 +111,6 @@ public class UserController {
 	@RequestMapping(value = "/login.do", method = RequestMethod.POST)
 	public String login(HttpServletRequest request) {
 		System.out.println("UserController的login方法开始执行");
-		System.out.println("UserController的login方法开始执行");
-		System.out.println("UserController的login方法开始执行");
-		System.out.println("UserController的login方法开始执行");
-		System.out.println("UserController的login方法开始执行");
-		System.out.println("UserController的login方法开始执行");
-		System.out.println("UserController的login方法开始执行");
-		System.out.println("UserController的login方法开始执行");
 		String username = request.getParameter("username");
 		String password = request.getParameter("password");
 		int rememeberMe = Integer.valueOf(request.getParameter("abcd"));
@@ -124,6 +124,15 @@ public class UserController {
 			e.printStackTrace();
 			return "error";
 		}
+		return "success";
+	}
+	
+	@RequestMapping(value = "/redis", method = RequestMethod.GET)
+	public String redis(HttpServletRequest request) {
+		System.out.println("UserController的redis方法开始执行");
+		Set<String> roleList = userService.selectRoleByUserName("admin");
+		System.out.println("roleList is OK");
+		User user = userService.selectByUserName("admin");
 		return "success";
 	}
 }
